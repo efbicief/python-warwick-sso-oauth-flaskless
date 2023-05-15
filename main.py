@@ -7,10 +7,12 @@ from flask import Flask, redirect, jsonify, request, Response
 from oauthlib.oauth1 import SIGNATURE_HMAC, SIGNATURE_TYPE_AUTH_HEADER, Client
 from requests_oauthlib import OAuth1Session
 
+from config import CONFIG
+
 app = Flask(__name__)
 
-CONSUMER_SECRET = "FILL_THIS_IN"
-CONSUMER_KEY = "FILL_THIS_IN"
+CONSUMER_SECRET = CONFIG.CONSUMER_SECRET
+CONSUMER_KEY = CONFIG.CONSUMER_KEY
 
 ACCESS_TOKEN_URL = "https://websignon.warwick.ac.uk/oauth/accessToken"
 AUTHORISE_URL = "https://websignon.warwick.ac.uk/oauth/authorise?"

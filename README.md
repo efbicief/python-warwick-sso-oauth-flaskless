@@ -7,7 +7,7 @@ Demonstrates how to log users in, retrieve basic attributes and fetch informatio
 
 # Usage:
 
-Fill in your consumer key and secret within `main.py`. You can [request](https://warwick.ac.uk/services/its/servicessupport/web/sign-on/help/oauth/apis/registration/) these from the web development team. This code assumes you're using a shared consumer secret (HMAC-SHA1), so don't provide a certificate.
+Rename `example_config.yaml` to `config.yaml`, and fill in your consumer key and secret. You can [request](https://warwick.ac.uk/services/its/servicessupport/web/sign-on/help/oauth/apis/registration/) these from the web development team. This code assumes you're using a shared consumer secret (HMAC-SHA1), so don't provide a certificate.
 
 Run the app: `python3 main.py`
 

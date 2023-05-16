@@ -54,8 +54,8 @@ def get_redirect_to_authorise_url(callback, expiry="forever"):
 # @app.route("/oauth/authorised")
 def get_authorised_oauth():
     generated_uuid = generate_and_store_uuid()
-    uuid_data = {"uuid": generated_uuid}
-    return jsonify(uuid_data)
+    # uuid_data = {"uuid": generated_uuid}
+    return generated_uuid
 
 
 def generate_and_store_uuid():
@@ -77,7 +77,6 @@ def generate_and_store_uuid():
 def get_warwick_info():
     oauth = _get_oauth_session_for_request()
     end_data = get_warwick_data_using_oauth(oauth)
-
     return jsonify(end_data)
 
 
@@ -105,22 +104,25 @@ def get_upcoming_events():
     print(json.dumps(end_data))
     return Response(json.dumps(end_data), mimetype='application/json')
 
-
 # @app.route("/oauth/tabula/assignments/")
-def get_assignments():
-    oauth = _get_oauth_session_for_request()
+def get_assignments(oauth_uuid=None):
+    oauth = _get_oauth_session_for_request(oauth_uuid)
 
     url_reqd = "https://tabula.warwick.ac.uk/api/v1/member/me/assignments"
     resp = oauth.request("GET", url_reqd)
     end_data = resp.json()
 
-    return Response(json.dumps(end_data), mimetype='application/json')
+    return end_data
+    # return Response(json.dumps(end_data), mimetype='application/json')
 
-
-def _get_oauth_session_for_request():
-    if "uuid" not in request.args:
-        raise Exception("No user UUID provided")
-    access_token = db_data.get_token_for_uuid(request.args.get("uuid"))
+def _get_oauth_session_for_request(oauth_uuid=None):
+    if oauth_uuid is None:
+        if "uuid" not in request.args:
+            raise Exception("No user UUID provided")
+        this_uuid = request.args.get("uuid")
+    else:
+        this_uuid = oauth_uuid
+    access_token = db_data.get_token_for_uuid(this_uuid)
     if access_token is None:
         raise Exception("Couldn't find an associated access token for that UUID")
     access_token = str(access_token)

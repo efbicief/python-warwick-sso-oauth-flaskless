@@ -3,14 +3,12 @@ import urllib
 import urllib.parse
 import uuid
 
-from flask import Flask, redirect, jsonify, request, Response
+from flask import redirect, jsonify, request, Response
 from oauthlib.oauth1 import SIGNATURE_HMAC, SIGNATURE_TYPE_AUTH_HEADER, Client
 from requests_oauthlib import OAuth1Session
 
-from db import Database
-from config import CONFIG
-
-app = Flask(__name__)
+from .db import Database
+from .config import CONFIG
 
 CONSUMER_SECRET = CONFIG.CONSUMER_SECRET
 CONSUMER_KEY = CONFIG.CONSUMER_KEY
@@ -30,14 +28,14 @@ class CustomClient(Client):
         return super()._render(request, formencode, realm)
 
 
-@app.route("/oauth/begin")
+# @app.route("/oauth/begin")
 def get_begin_oauth():
     base_url = get_base_url()
     return get_redirect_to_authorise_url("%s/oauth/authorised" % base_url)
 
 
 def get_base_url():
-    return "http://localhost:8091"
+    return "http://localhost:5000"
 
 
 def get_redirect_to_authorise_url(callback, expiry="forever"):
@@ -53,7 +51,7 @@ def get_redirect_to_authorise_url(callback, expiry="forever"):
     return redirect(AUTHORISE_URL + authorise_qs, code=302)
 
 
-@app.route("/oauth/authorised")
+# @app.route("/oauth/authorised")
 def get_authorised_oauth():
     generated_uuid = generate_and_store_uuid()
     uuid_data = {"uuid": generated_uuid}
@@ -75,7 +73,7 @@ def generate_and_store_uuid():
     return generated_uuid
 
 
-@app.route("/oauth/userInfo")
+# @app.route("/oauth/userInfo")
 def get_warwick_info():
     oauth = _get_oauth_session_for_request()
     end_data = get_warwick_data_using_oauth(oauth)
@@ -96,7 +94,7 @@ def get_warwick_data_using_oauth(oauth):
     return end_data
 
 
-@app.route("/oauth/tabula/events/")
+# @app.route("/oauth/tabula/events/")
 def get_upcoming_events():
     oauth = _get_oauth_session_for_request()
     url_reqd = "https://tabula.warwick.ac.uk/api/v1/member/me/timetable/events"
@@ -108,7 +106,7 @@ def get_upcoming_events():
     return Response(json.dumps(end_data), mimetype='application/json')
 
 
-@app.route("/oauth/tabula/assignments/")
+# @app.route("/oauth/tabula/assignments/")
 def get_assignments():
     oauth = _get_oauth_session_for_request()
 
@@ -134,6 +132,3 @@ def _get_oauth_session_for_request():
     oauth = OAuth1Session(CONSUMER_KEY, CONSUMER_SECRET, resource_owner_key=access_token,
                     resource_owner_secret=access_token_secret, client_class=CustomClient)
     return oauth
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8091, debug=False)

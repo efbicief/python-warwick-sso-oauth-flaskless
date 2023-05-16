@@ -21,7 +21,6 @@ REQUEST_TOKEN_URL = "https://websignon.warwick.ac.uk/oauth/requestToken?"
 
 SCOPES = "urn:websignon.warwick.ac.uk:sso:service urn:tabula.warwick.ac.uk:tabula:service"
 
-temp_data = {}
 db_data = Database("db.sqlite3")
 
 
@@ -49,9 +48,7 @@ def get_redirect_to_authorise_url(callback, expiry="forever"):
     resp = oauth.fetch_request_token(
         url=REQUEST_TOKEN_URL + urllib.parse.urlencode({"scope": SCOPES, "expiry": expiry}))
 
-    # temp_data["token-secret-for:" + resp['oauth_token']] = resp['oauth_token_secret']
     db_data.add_secret_for_token(resp['oauth_token'], resp['oauth_token_secret'])
-    print("Adding token-secret-for: " + resp['oauth_token'] + resp['oauth_token_secret'])
     authorise_qs = urllib.parse.urlencode({"oauth_token": resp['oauth_token']})
     return redirect(AUTHORISE_URL + authorise_qs, code=302)
 
@@ -64,20 +61,15 @@ def get_authorised_oauth():
 
 
 def generate_and_store_uuid():
-    # data_key_for_secret = "token-secret-for:" + request.args.get("oauth_token")
-    # print(data_key_for_secret)
     last_secret = db_data.get_secret_for_token(request.args.get("oauth_token"))
     if last_secret is None:
         raise Exception("Couldn't find that OAuth token")
     last_secret = str(last_secret)
-    print("Got secret for token: " + last_secret)
     oauth = OAuth1Session(CONSUMER_KEY, CONSUMER_SECRET, resource_owner_secret=last_secret, client_class=CustomClient)
     oauth.parse_authorization_response(request.url)
     access = oauth.fetch_access_token(ACCESS_TOKEN_URL)
     generated_uuid = str(uuid.uuid1())
-    # temp_data["token-for-uuid:" + generated_uuid] = access['oauth_token']
     db_data.add_token_for_uuid(generated_uuid, access['oauth_token'])
-    # temp_data["token-secret-for:" + access['oauth_token']] = access['oauth_token_secret']
     db_data.add_secret_for_token(access['oauth_token'], access['oauth_token_secret'])
 
     return generated_uuid
@@ -138,9 +130,6 @@ def _get_oauth_session_for_request():
     if access_token_secret is None:
         raise Exception("Couldn't find secret")
     access_token_secret = str(access_token_secret)
-
-    print(access_token)
-    print(access_token_secret)
 
     oauth = OAuth1Session(CONSUMER_KEY, CONSUMER_SECRET, resource_owner_key=access_token,
                     resource_owner_secret=access_token_secret, client_class=CustomClient)

@@ -134,3 +134,6 @@ def _get_oauth_session_for_request(oauth_uuid=None):
     oauth = OAuth1Session(CONSUMER_KEY, CONSUMER_SECRET, resource_owner_key=access_token,
                     resource_owner_secret=access_token_secret, client_class=CustomClient)
     return oauth
+
+def get_uuid_from_cookie():
+    return request.cookies.get("uuid")

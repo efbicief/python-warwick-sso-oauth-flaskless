@@ -115,6 +115,16 @@ def get_assignments(oauth_uuid=None):
     return end_data
     # return Response(json.dumps(end_data), mimetype='application/json')
 
+def get_user_info(oauth_uuid=None):
+    oauth = _get_oauth_session_for_request(oauth_uuid)
+
+    url_reqd = "https://tabula.warwick.ac.uk/api/v1/member/me"
+    resp = oauth.request("GET", url_reqd)
+    end_data = resp.json()
+    member = end_data["member"]
+
+    return member
+
 def _get_oauth_session_for_request(oauth_uuid=None):
     if oauth_uuid is None:
         if "uuid" not in request.args:

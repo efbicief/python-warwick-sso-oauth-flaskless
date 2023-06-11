@@ -134,6 +134,7 @@ def _get_oauth_session_for_request(oauth_uuid=None):
         this_uuid = oauth_uuid
     access_token = db_data.get_token_for_uuid(this_uuid)
     if access_token is None:
+        
         raise Exception("Couldn't find an associated access token for that UUID")
     access_token = str(access_token)
     access_token_secret = db_data.get_secret_for_token(access_token)

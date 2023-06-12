@@ -10,6 +10,8 @@ from requests_oauthlib import OAuth1Session
 from .db import Database
 from .config import CONFIG
 
+from pprint import pprint as pp
+
 CONSUMER_SECRET = CONFIG.CONSUMER_SECRET
 CONSUMER_KEY = CONFIG.CONSUMER_KEY
 
@@ -125,12 +127,18 @@ def get_user_info(oauth_uuid=None):
 
     return member
 
-def get_attendance(oauth_uuid=None):
+def get_attendance(begin:int, end:int, oauth_uuid=None):
     oauth = _get_oauth_session_for_request(oauth_uuid)
 
-    url_reqd = "https://tabula.warwick.ac.uk/api/v1/member/me/attendance"
-    resp = oauth.request("GET", url_reqd)
-    end_data = resp.json()
+    end_data = []
+    for year in range(begin, end):
+        url_reqd = f"https://tabula.warwick.ac.uk/api/v1/member/me/attendance/{year}"
+        resp = oauth.request("GET", url_reqd)
+        end_data.append(resp.json())
+
+    print("attendance")
+    pp(end_data)
+    print()
 
     return end_data
 

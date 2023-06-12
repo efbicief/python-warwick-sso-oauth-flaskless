@@ -125,6 +125,15 @@ def get_user_info(oauth_uuid=None):
 
     return member
 
+def get_attendance(oauth_uuid=None):
+    oauth = _get_oauth_session_for_request(oauth_uuid)
+
+    url_reqd = "https://tabula.warwick.ac.uk/api/v1/member/me/attendance"
+    resp = oauth.request("GET", url_reqd)
+    end_data = resp.json()
+
+    return end_data
+
 def _get_oauth_session_for_request(oauth_uuid=None):
     if oauth_uuid is None:
         if "uuid" not in request.args:
